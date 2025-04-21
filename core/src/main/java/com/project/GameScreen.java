@@ -66,6 +66,7 @@ public class GameScreen implements Screen {
     private void initTextures() {
         torchRed = new Texture("Torch_Red.png");
         backgroundTexture = new Texture("background.jpg"); // Cambia esto si tu fondo tiene otro nombre
+        backgroundTexture.setWrap(Texture.TextureWrap.MirroredRepeat, Texture.TextureWrap.MirroredRepeat);
         torchFrames = extractFrames(torchRed, 192, 192, 8, 6);
     }
 
@@ -126,9 +127,29 @@ public class GameScreen implements Screen {
 
     private void drawMap() {
         batch.begin();
-        batch.draw(backgroundTexture, 0, 0);
+
+        int textureWidth = backgroundTexture.getWidth();
+        int textureHeight = backgroundTexture.getHeight();
+
+        // Calcula en quina "rajola" estàs (és a dir, quina còpia de la textura mostra la càmera)
+        int startX = (int) ((camera.position.x - 500) / textureWidth) - 1;
+        int startY = (int) ((camera.position.y - 400) / textureHeight) - 1;
+
+        // Quants tiles calen per cobrir l'àrea de 1000x800?
+        int tilesX = 4;
+        int tilesY = 4;
+
+        for (int x = startX; x < startX + tilesX; x++) {
+            for (int y = startY; y < startY + tilesY; y++) {
+                float drawX = x * textureWidth;
+                float drawY = y * textureHeight;
+                batch.draw(backgroundTexture, drawX, drawY);
+            }
+        }
+
         batch.end();
     }
+
 
     private void drawLocalPlayer() {
         batch.begin();
